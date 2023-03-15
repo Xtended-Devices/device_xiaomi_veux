@@ -22,6 +22,7 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -35,8 +36,7 @@ public final class FileUtils {
 
     /**
      * Reads the first line of text from the given file.
-     * Reference {@link BufferedReader#readLine()} for clarification on what a
-     * line is
+     * Reference {@link BufferedReader#readLine()} for clarification on what a line is
      *
      * @return the read line contents, or null on failure
      */
@@ -152,15 +152,74 @@ public final class FileUtils {
         try {
             ok = srcFile.renameTo(dstFile);
         } catch (SecurityException e) {
-            Log.w(TAG,
-                    "SecurityException trying to rename " + srcPath + " to " + dstPath,
-                    e);
+            Log.w(TAG, "SecurityException trying to rename " + srcPath + " to " + dstPath, e);
         } catch (NullPointerException e) {
-            Log.e(TAG,
-                    "NullPointerException trying to rename " + srcPath + " to " +
-                            dstPath,
-                    e);
+            Log.e(TAG, "NullPointerException trying to rename " + srcPath + " to " + dstPath, e);
         }
         return ok;
+    }
+ 
+    public static void setValue(String path, int value) {
+        if (isFileWritable(path)) {
+            if (path == null) {
+                return;
+            }
+            try {
+                FileOutputStream fos = new FileOutputStream(new File(path));
+                fos.write(Integer.toString(value).getBytes());
+                fos.flush();
+                fos.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static void setValue(String path, boolean value) {
+        if (isFileWritable(path)) {
+            if (path == null) {
+                return;
+            }
+            try {
+                FileOutputStream fos = new FileOutputStream(new File(path));
+                fos.write((value ? "1" : "0").getBytes());
+                fos.flush();
+                fos.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static void setValue(String path, double value) {
+        if (isFileWritable(path)) {
+            if (path == null) {
+                return;
+            }
+            try {
+                FileOutputStream fos = new FileOutputStream(new File(path));
+                fos.write(Long.toString(Math.round(value)).getBytes());
+                fos.flush();
+                fos.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static void setValue(String path, String value) {
+        if (isFileWritable(path)) {
+            if (path == null) {
+                return;
+            }
+            try {
+                FileOutputStream fos = new FileOutputStream(new File(path));
+                fos.write(value.getBytes());
+                fos.flush();
+                fos.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

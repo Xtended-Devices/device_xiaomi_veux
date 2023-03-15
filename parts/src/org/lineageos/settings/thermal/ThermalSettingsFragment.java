@@ -1,12 +1,12 @@
 /**
  * Copyright (C) 2020 The LineageOS Project
- * <p>
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * <p>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -60,9 +60,8 @@ public class ThermalSettingsFragment extends PreferenceFragment
     private Map<String, ApplicationsState.AppEntry> mEntryMap =
             new HashMap<String, ApplicationsState.AppEntry>();
 
-    private RecyclerView mAppsRecyclerView;
-
     private ThermalUtils mThermalUtils;
+    private RecyclerView mAppsRecyclerView;
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
@@ -84,7 +83,7 @@ public class ThermalSettingsFragment extends PreferenceFragment
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+            Bundle savedInstanceState) {
         return inflater.inflate(R.layout.thermal_layout, container, false);
     }
 
@@ -197,8 +196,6 @@ public class ThermalSettingsFragment extends PreferenceFragment
         switch (state) {
             case ThermalUtils.STATE_BENCHMARK:
                 return R.drawable.ic_thermal_benchmark;
-            case ThermalUtils.STATE_BROWSER:
-                return R.drawable.ic_thermal_browser;
             case ThermalUtils.STATE_CAMERA:
                 return R.drawable.ic_thermal_camera;
             case ThermalUtils.STATE_DIALER:
@@ -219,6 +216,7 @@ public class ThermalSettingsFragment extends PreferenceFragment
         private ImageView icon;
         private View rootView;
         private ImageView stateIcon;
+        private ImageView touchIcon;
 
         private ViewHolder(View view) {
             super(view);
@@ -226,6 +224,7 @@ public class ThermalSettingsFragment extends PreferenceFragment
             this.mode = view.findViewById(R.id.app_mode);
             this.icon = view.findViewById(R.id.app_icon);
             this.stateIcon = view.findViewById(R.id.state);
+            this.touchIcon = view.findViewById(R.id.touch);
             this.rootView = view;
 
             view.setTag(this);
@@ -238,11 +237,10 @@ public class ThermalSettingsFragment extends PreferenceFragment
         private final int[] items = {
                 R.string.thermal_default,
                 R.string.thermal_benchmark,
-                R.string.thermal_browser,
                 R.string.thermal_camera,
                 R.string.thermal_dialer,
                 R.string.thermal_gaming,
-                R.string.thermal_streaming
+                R.string.thermal_streaming,
         };
 
         private ModeAdapter(Context context) {
@@ -276,7 +274,6 @@ public class ThermalSettingsFragment extends PreferenceFragment
 
             view.setText(items[position]);
             view.setTextSize(14f);
-
             return view;
         }
     }
@@ -305,21 +302,31 @@ public class ThermalSettingsFragment extends PreferenceFragment
         @NonNull
         @Override
         public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            ViewHolder holder = new ViewHolder(LayoutInflater.from(parent.getContext())
+            return new ViewHolder(LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.thermal_list_item, parent, false));
-            Context context = holder.itemView.getContext();
-            holder.mode.setAdapter(new ModeAdapter(context));
-            holder.mode.setOnItemSelectedListener(this);
-            return holder;
         }
 
         @Override
         public void onBindViewHolder(ViewHolder holder, int position) {
+            Context context = holder.itemView.getContext();
             ApplicationsState.AppEntry entry = mEntries.get(position);
-
             if (entry == null) {
                 return;
             }
+
+            holder.mode.setAdapter(new ModeAdapter(context));
+            holder.mode.setOnItemSelectedListener(this);
+            holder.touchIcon.setOnClickListener(v -> {
+                TouchSettingsFragment touchSettingsFragment = new TouchSettingsFragment();
+                Bundle bundle = new Bundle();
+                bundle.putString("appName", entry.label);
+                bundle.putString("packageName", entry.info.packageName);
+                touchSettingsFragment.setArguments(bundle);
+                getActivity().getFragmentManager().beginTransaction()
+                        .replace(R.id.content_frame, touchSettingsFragment, "touchSettingsFragment")
+                        .addToBackStack(null)
+                        .commit();
+            });
 
             holder.title.setText(entry.label);
             holder.title.setOnClickListener(v -> holder.mode.performClick());
@@ -328,11 +335,17 @@ public class ThermalSettingsFragment extends PreferenceFragment
             int packageState = mThermalUtils.getStateForPackage(entry.info.packageName);
             holder.mode.setSelection(packageState, false);
             holder.mode.setTag(entry);
+            if (packageState == ThermalUtils.STATE_BENCHMARK ||
+                packageState == ThermalUtils.STATE_GAMING) {
+                holder.touchIcon.setVisibility(View.VISIBLE);
+            } else {
+                holder.touchIcon.setVisibility(View.INVISIBLE);
+            }
             holder.stateIcon.setImageResource(getStateDrawable(packageState));
         }
 
         private void setEntries(List<ApplicationsState.AppEntry> entries,
-                                List<String> sections, List<Integer> positions) {
+                List<String> sections, List<Integer> positions) {
             mEntries = entries;
             mSections = sections.toArray(new String[sections.size()]);
             mPositions = new int[positions.size()];
