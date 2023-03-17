@@ -11,22 +11,27 @@ $(call inherit-product, $(SRC_TARGET_DIR)/product/full_base_telephony.mk)
 # Inherit from veux device
 $(call inherit-product, device/xiaomi/veux/device.mk)
 
-# Inherit some common Octavi stuff.
-$(call inherit-product, vendor/octavi/config/common_full_phone.mk)
+# Inherit some common XT stuff.
+$(call inherit-product, vendor/xtended/config/common_full_phone.mk)
 
 PRODUCT_SOONG_NAMESPACES += \
 $(LOCAL_PATH) \
 hardware/qcom-caf/sm8350
 
+# Inherit some xtended build stuff.
+TARGET_BOOT_ANIMATION_RES := 1080
+XTENDED_BUILD_TYPE := UNOFFICIAL
+XTENDED_BUILD_MAINTAINER := mlzdbz
+WITH_GAPPS=true
+PROCESSOR_MODEL := sm6375
+TARGET_FACE_UNLOCK_SUPPORTED := true
+TARGET_SUPPORTS_GOOGLE_RECORDER := true
+TARGET_SUPPORTS_QUICK_TAP := true
+TARGET_USES_BLUR := true
 BOARD_USES_QCOM_HARDWARE := true
-TARGET_BOARD_PLATFORM := sm6375
 
-WITH_GAPPS := true
-
-OCTAVI_BUILD_TYPE := UnOfficial
-OCTAVI_DEVICE_MAINTAINER := mlzdbz
-
-PRODUCT_NAME := octavi_veux
+# Device Identification
+PRODUCT_NAME := xtended_veux
 PRODUCT_DEVICE := veux
 PRODUCT_MANUFACTURER := Xiaomi
 PRODUCT_BRAND := POCO
@@ -38,4 +43,3 @@ PRODUCT_BUILD_PROP_OVERRIDES += \
     PRIVATE_BUILD_DESC="cheetah-user 13 TQ1A.230205.002 9471150 release-keys"
 
 BUILD_FINGERPRINT := "google/cheetah/cheetah:13/TQ1A.230205.002/9471150:user/release-keys"
-

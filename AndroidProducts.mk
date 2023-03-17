@@ -5,7 +5,7 @@
 #
 
 PRODUCT_MAKEFILES := \
-	$(LOCAL_DIR)/octavi_veux.mk
+	$(LOCAL_DIR)/xtended_veux.mk
 
 COMMON_LUNCH_CHOICES := \
-    $(foreach variant, user userdebug eng, octavi_veux-$(variant))
+    $(foreach variant, user userdebug eng, xtended_veux-$(variant))
