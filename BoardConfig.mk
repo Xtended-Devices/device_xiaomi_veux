@@ -21,6 +21,9 @@ AB_OTA_PARTITIONS += \
     vendor \
     vendor_boot
 
+# MiuiCamera
+-include vendor/xiaomi/miuicamera/BoardConfigAnx.mk
+
 # Architecture
 TARGET_ARCH := arm64
 TARGET_ARCH_VARIANT := armv8-a
